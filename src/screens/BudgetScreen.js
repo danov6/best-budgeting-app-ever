@@ -1,39 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   View, 
   ScrollView, 
-  StyleSheet, 
-  SafeAreaView,
+  StyleSheet,
   StatusBar 
 } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
+import TopNavBar from '../components/TopNavBar';
+import BottomNavBar from '../components/BottomNavBar';
 import IncomeInput from '../components/IncomeInput';
-import BudgetPieChart from '../components/PieChart';
+import ChartViewToggle from '../components/ChartViewToggle';
+import BudgetChart from '../components/BudgetChart';
 import ExpenseInput from '../components/ExpenseInput';
 import ExpenseList from '../components/ExpenseList';
 import SuggestionBubbles from '../components/SuggestionBubbles';
-import AISuggestions from '../components/AISuggestions';
 
-const BudgetScreen = () => {
-  const { theme } = useTheme();
-  const [income, setIncome] = useState(5000);
-  const [expenses, setExpenses] = useState([]);
+const BudgetScreen = ({ onTabChange, sharedData, updateSharedData }) => {
+  const { theme, isDarkMode } = useTheme();
+  const [chartView, setChartView] = useState('bar');
+  
+  const income = sharedData?.income || 5000;
+  const expenses = sharedData?.expenses || [];
 
   const handleAddExpense = (expense) => {
-    setExpenses(prev => [...prev, expense]);
+    const newExpenses = [...expenses, expense];
+    updateSharedData({ expenses: newExpenses });
   };
 
   const handleDeleteExpense = (expenseId) => {
-    setExpenses(prev => prev.filter(exp => exp.id !== expenseId));
+    const newExpenses = expenses.filter(exp => exp.id !== expenseId);
+    updateSharedData({ expenses: newExpenses });
   };
 
   const handleAddSuggestion = (suggestion) => {
-    // Add suggestion with default amount, user can edit later
-    const expenseWithAmount = {
-      ...suggestion,
-      amount: 50 // Default amount for suggestions
-    };
-    setExpenses(prev => [...prev, expenseWithAmount]);
+    const newExpenses = [...expenses, suggestion];
+    updateSharedData({ expenses: newExpenses });
+  };
+
+  const handleIncomeUpdate = (newIncome) => {
+    updateSharedData({ income: newIncome });
   };
 
   const styles = StyleSheet.create({
@@ -50,11 +55,14 @@ const BudgetScreen = () => {
   });
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar 
-        barStyle={theme === 'dark' ? 'light-content' : 'dark-content'}
-        backgroundColor={theme.background}
+        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        backgroundColor={theme.surface}
       />
+      
+      <TopNavBar />
+      
       <ScrollView 
         style={styles.scrollView}
         contentContainerStyle={styles.content}
@@ -62,38 +70,37 @@ const BudgetScreen = () => {
       >
         <IncomeInput 
           income={income} 
-          onUpdateIncome={setIncome} 
+          onUpdateIncome={handleIncomeUpdate} 
         />
         
-        <BudgetPieChart 
+        <ChartViewToggle 
+          activeView={chartView}
+          onViewChange={setChartView}
+        />
+        
+        <BudgetChart 
           income={income} 
-          expenses={expenses} 
+          expenses={expenses}
+          viewType={chartView}
         />
         
         <ExpenseInput 
           onAddExpense={handleAddExpense} 
         />
         
-        {expenses.length > 0 && (
-          <SuggestionBubbles 
-            expenses={expenses}
-            onAddSuggestion={handleAddSuggestion}
-          />
-        )}
+        <SuggestionBubbles 
+          expenses={expenses}
+          onAddSuggestion={handleAddSuggestion}
+        />
         
         <ExpenseList 
           expenses={expenses}
           onDeleteExpense={handleDeleteExpense}
         />
-        
-        {expenses.length > 0 && (
-          <AISuggestions 
-            income={income}
-            expenses={expenses}
-          />
-        )}
       </ScrollView>
-    </SafeAreaView>
+      
+      <BottomNavBar activeTab="budget" onTabChange={onTabChange} />
+    </View>
   );
 };
 

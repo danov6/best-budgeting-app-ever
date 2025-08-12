@@ -23,6 +23,28 @@ const AISuggestions = ({ income, expenses }) => {
       const remaining = income - totalExpenses;
       const suggestions = [];
 
+      // If no expenses, provide general budgeting advice
+      if (expenses.length === 0) {
+        suggestions.push({
+          type: 'opportunity',
+          title: 'Start Your Budget Journey',
+          message: `With a monthly income of $${income.toFixed(2)}, you have great potential! Start by tracking your essential expenses like rent, utilities, and groceries.`,
+          icon: 'rocket-launch'
+        });
+        suggestions.push({
+          type: 'tip',
+          title: '50/30/20 Rule',
+          message: 'Try the 50/30/20 budgeting rule: 50% for needs, 30% for wants, and 20% for savings and debt repayment.',
+          icon: 'chart-pie'
+        });
+        suggestions.push({
+          type: 'alternative',
+          title: 'Emergency Fund',
+          message: 'Aim to save 3-6 months of expenses in an emergency fund. Start with just $50-100 per month.',
+          icon: 'shield-check'
+        });
+      }
+
       // Budget analysis suggestions
       if (remaining < 0) {
         suggestions.push({
@@ -125,12 +147,6 @@ const AISuggestions = ({ income, expenses }) => {
       fontSize: 16,
       fontWeight: 'bold',
       marginLeft: 8,
-    },
-    loadingText: {
-      textAlign: 'center',
-      color: theme.textSecondary,
-      fontSize: 16,
-      marginVertical: 20,
     },
     suggestionItem: {
       flexDirection: 'row',
