@@ -8,6 +8,7 @@ import {
 import { useTheme } from '../context/ThemeContext';
 import TopNavBar from '../components/TopNavBar';
 import BottomNavBar from '../components/BottomNavBar';
+import TakeHomeSummary from '../components/TakeHomeSummary';
 import IncomeInput from '../components/IncomeInput';
 import ChartViewToggle from '../components/ChartViewToggle';
 import BudgetChart from '../components/BudgetChart';
@@ -61,13 +62,18 @@ const BudgetScreen = ({ onTabChange, sharedData, updateSharedData }) => {
         backgroundColor={theme.surface}
       />
       
-      <TopNavBar />
+      <TopNavBar onAddExpense={handleAddExpense} expenses={expenses} />
       
       <ScrollView 
         style={styles.scrollView}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
+        <TakeHomeSummary 
+          income={income}
+          expenses={expenses}
+        />
+        
         <IncomeInput 
           income={income} 
           onUpdateIncome={handleIncomeUpdate} 
@@ -87,12 +93,12 @@ const BudgetScreen = ({ onTabChange, sharedData, updateSharedData }) => {
         <ExpenseInput 
           onAddExpense={handleAddExpense} 
         />
-        
-        <SuggestionBubbles 
+
+        <SuggestionBubbles    
           expenses={expenses}
           onAddSuggestion={handleAddSuggestion}
         />
-        
+
         <ExpenseList 
           expenses={expenses}
           onDeleteExpense={handleDeleteExpense}

@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { ThemeProvider } from './src/context/ThemeContext';
 import BudgetScreen from './src/screens/BudgetScreen';
 import AISuggestionsScreen from './src/screens/AISuggestionsScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('budget');
@@ -24,6 +25,10 @@ export default function App() {
             income={sharedData.income}
             expenses={sharedData.expenses}
             onTabChange={setActiveTab}
+            onAddExpense={(expense) => {
+              const newExpenses = [...sharedData.expenses, expense];
+              updateSharedData({ expenses: newExpenses });
+            }}
           />
         );
       case 'goals':
@@ -36,12 +41,9 @@ export default function App() {
           />
         );
       case 'settings':
-        // Placeholder for future Settings screen
         return (
-          <BudgetScreen 
+          <SettingsScreen 
             onTabChange={setActiveTab}
-            sharedData={sharedData}
-            updateSharedData={updateSharedData}
           />
         );
       default:

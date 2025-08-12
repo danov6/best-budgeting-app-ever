@@ -4,9 +4,10 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "../context/ThemeContext";
 import TopNavBar from "../components/TopNavBar";
 import BottomNavBar from "../components/BottomNavBar";
+import TakeHomeSummary from "../components/TakeHomeSummary";
 import AISuggestions from "../components/AISuggestions";
 
-const AISuggestionsScreen = ({ income = 5000, expenses = [], onTabChange }) => {
+const AISuggestionsScreen = ({ income = 5000, expenses = [], onTabChange, onAddExpense }) => {
   const { theme, isDarkMode } = useTheme();
 
   const styles = StyleSheet.create({
@@ -71,13 +72,18 @@ const AISuggestionsScreen = ({ income = 5000, expenses = [], onTabChange }) => {
         backgroundColor={theme.surface}
       />
 
-      <TopNavBar title="AI Budget Assistant" />
+      <TopNavBar title="AI Budget Assistant" onAddExpense={onAddExpense} expenses={expenses} />
 
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
+        <TakeHomeSummary 
+          income={income}
+          expenses={expenses}
+        />
+
         <View style={styles.headerSection}>
           <MaterialCommunityIcons
             name="robot"

@@ -46,7 +46,7 @@ const AddExpenseModal = ({ visible, expense, onConfirm, onCancel }) => {
       borderRadius: 20,
       padding: 25,
       margin: 10,
-      width: '95%',
+      width: '100vw',
       shadowColor: theme.text,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.3,

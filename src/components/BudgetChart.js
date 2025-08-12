@@ -1,9 +1,7 @@
 import React from "react";
-import { View, Text, Dimensions } from "react-native";
+import { View, Text, Dimensions, StyleSheet } from "react-native";
 import { PieChart } from "react-native-chart-kit";
 import { useTheme } from "../context/ThemeContext";
-
-const screenWidth = Dimensions.get("window").width;
 
 const BudgetChart = ({ income, expenses, viewType = "bar" }) => {
   const { theme } = useTheme();
@@ -61,157 +59,150 @@ const BudgetChart = ({ income, expenses, viewType = "bar" }) => {
     useShadowColorFromDataset: false,
   };
 
-  const renderBarChart = () => (
-    <View
-      style={{
-        alignItems: "center",
-        marginVertical: 20,
-        paddingHorizontal: 20,
-      }}
-    >
-      <Text
-        style={{
-          fontSize: 18,
-          fontWeight: "bold",
-          color: theme.text,
-          marginBottom: 20,
-        }}
-      >
-        Monthly Budget Overview
-      </Text>
+  const styles = StyleSheet.create({
+    container: {
+      alignItems: "center",
+      marginVertical: 20,
+      paddingHorizontal: 20,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: "bold",
+      color: theme.text,
+      marginBottom: 20,
+      textAlign: "center",
+    },
+    progressBarContainer: {
+      width: "100%",
+      height: 40,
+      backgroundColor: theme.surface,
+      borderRadius: 20,
+      flexDirection: "row",
+      overflow: "hidden",
+      marginBottom: 20,
+      borderWidth: 2,
+      borderColor: theme.border,
+    },
+    expenseBar: {
+      backgroundColor: theme.primary,
+      height: "100%",
+    },
+    remainingBar: {
+      backgroundColor: theme.success,
+      height: "100%",
+    },
+    statsContainer: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+      width: "100%",
+      marginTop: 15,
+    },
+    statItem: {
+      alignItems: "center",
+      flex: 1,
+    },
+    statAmount: {
+      fontSize: 16,
+      fontWeight: "bold",
+    },
+    statLabel: {
+      fontSize: 12,
+      marginTop: 2,
+      textAlign: "center",
+    },
+    emptyState: {
+      fontSize: 16,
+      color: theme.textSecondary,
+      textAlign: "center",
+      marginTop: 40,
+    },
+  });
 
-      {/* Progress Bar Style Chart */}
-      <View
-        style={{
-          width: screenWidth - 40,
-          height: 40,
-          backgroundColor: theme.surface,
-          borderRadius: 20,
-          flexDirection: "row",
-          overflow: "hidden",
-          marginBottom: 20,
-          borderWidth: 2,
-          borderColor: theme.border,
-        }}
-      >
-        <View
-          style={{
-            width: `${Math.min(expensePercentage, 100)}%`,
-            backgroundColor: theme.primary,
-            height: "100%",
-          }}
-        />
-        <View
-          style={{
-            width: `${Math.min(remainingPercentage, 100)}%`,
-            backgroundColor: theme.success,
-            height: "100%",
-          }}
-        />
-      </View>
+  const renderBarChart = () => {
+    // Fix percentage calculation to ensure they don't exceed 100%
+    const safeExpensePercentage = Math.min(expensePercentage, 100);
+    const safeRemainingPercentage = Math.max(
+      0,
+      Math.min(remainingPercentage, 100 - safeExpensePercentage)
+    );
 
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-around",
-          width: "100%",
-          marginTop: 15,
-        }}
-      >
-        <View style={{ alignItems: "center" }}>
-          <Text style={{ color: theme.text, fontSize: 16, fontWeight: "bold" }}>
-            ${income.toFixed(2)}
-          </Text>
-          <Text style={{ color: theme.textSecondary, fontSize: 12 }}>
-            Income
-          </Text>
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>Monthly Budget Overview</Text>
+
+        {/* Responsive Progress Bar */}
+        <View style={styles.progressBarContainer}>
+          <View
+            style={[styles.expenseBar, { width: `${safeExpensePercentage}%` }]}
+          />
+          <View
+            style={[
+              styles.remainingBar,
+              { width: `${safeRemainingPercentage}%` },
+            ]}
+          />
         </View>
-        <View style={{ alignItems: "center" }}>
-          <Text
-            style={{ color: theme.primary, fontSize: 16, fontWeight: "bold" }}
-          >
-            ${totalExpenses.toFixed(2)}
-          </Text>
-          <Text style={{ color: theme.textSecondary, fontSize: 12 }}>
-            Expenses ({expensePercentage.toFixed(1)}%)
-          </Text>
-        </View>
-        <View style={{ alignItems: "center" }}>
-          <Text
-            style={{
-              color: remaining >= 0 ? theme.success : theme.error,
-              fontSize: 16,
-              fontWeight: "bold",
-            }}
-          >
-            ${remaining.toFixed(2)}
-          </Text>
-          <Text style={{ color: theme.textSecondary, fontSize: 12 }}>
-            Remaining ({remainingPercentage.toFixed(1)}%)
-          </Text>
+
+        <View style={styles.statsContainer}>
+          <View style={styles.statItem}>
+            <Text style={[styles.statAmount, { color: theme.text }]}>
+              ${income.toFixed(2)}
+            </Text>
+            <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
+              Income
+            </Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={[styles.statAmount, { color: theme.primary }]}>
+              ${totalExpenses.toFixed(2)}
+            </Text>
+            <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
+              Expenses ({expensePercentage.toFixed(1)}%)
+            </Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text
+              style={[
+                styles.statAmount,
+                { color: remaining >= 0 ? theme.success : theme.error },
+              ]}
+            >
+              ${remaining.toFixed(2)}
+            </Text>
+            <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
+              Remaining ({remainingPercentage.toFixed(1)}%)
+            </Text>
+          </View>
         </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   const renderPieChart = () => {
     const expenseData = getExpensesByCategory();
 
     if (expenses.length === 0) {
       return (
-        <View
-          style={{
-            alignItems: "center",
-            marginVertical: 20,
-            paddingHorizontal: 20,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: "bold",
-              color: theme.text,
-              marginBottom: 20,
-            }}
-          >
-            Expense Breakdown
-          </Text>
-          <Text
-            style={{
-              fontSize: 16,
-              color: theme.textSecondary,
-              textAlign: "center",
-              marginTop: 40,
-            }}
-          >
+        <View style={styles.container}>
+          <Text style={styles.title}>Expense Breakdown</Text>
+          <Text style={styles.emptyState}>
             Add some expenses to see your breakdown
           </Text>
         </View>
       );
     }
 
+    // Get screen dimensions dynamically for responsive chart
+    const screenWidth = Dimensions.get("window").width;
+    const chartWidth = Math.min(screenWidth - 40, 350); // Max width of 350
+
     return (
-      <View
-        style={{
-          alignItems: "center",
-          marginVertical: 20,
-          paddingHorizontal: 20,
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 18,
-            fontWeight: "bold",
-            color: theme.text,
-            marginBottom: 20,
-          }}
-        >
-          Expense Breakdown
-        </Text>
+      <View style={styles.container}>
+        <Text style={styles.title}>Expense Breakdown</Text>
 
         <PieChart
           data={expenseData}
-          width={screenWidth - 40}
+          width={chartWidth}
           height={220}
           chartConfig={chartConfig}
           accessor="amount"
@@ -220,19 +211,15 @@ const BudgetChart = ({ income, expenses, viewType = "bar" }) => {
           absolute
         />
 
-        <View
-          style={{
-            alignItems: "center",
-            marginTop: 15,
-          }}
-        >
-          <Text
-            style={{ color: theme.primary, fontSize: 16, fontWeight: "bold" }}
-          >
+        <View style={{ alignItems: "center", marginTop: 15 }}>
+          <Text style={[styles.statAmount, { color: theme.primary }]}>
             Total Expenses: ${totalExpenses.toFixed(2)}
           </Text>
           <Text
-            style={{ color: theme.textSecondary, fontSize: 12, marginTop: 5 }}
+            style={[
+              styles.statLabel,
+              { color: theme.textSecondary, marginTop: 5 },
+            ]}
           >
             {expenses.length} expense{expenses.length !== 1 ? "s" : ""} across{" "}
             {expenseData.length} categor{expenseData.length !== 1 ? "ies" : "y"}
